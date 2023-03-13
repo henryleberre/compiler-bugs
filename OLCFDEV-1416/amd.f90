@@ -1,3 +1,13 @@
+module metric
+
+   implicit none
+
+   real*8, pointer::xjac(:,:,:,:)
+! Declaring an allocatable array as device_resident works
+   !$acc declare device_resident(xjac)
+
+end module metric
+
 module transformations
     contains
     subroutine transform(u,v,w,result)
@@ -17,15 +27,6 @@ module transformations
    end subroutine transform
 end module transformations
 
-module metric
-
-   implicit none
-
-   real*8, pointer::xjac(:,:,:,:)
-! Declaring an allocatable array as device_resident works
-   !$acc declare device_resident(xjac)
-
-end module metric
 program main
 
    use transformations, only : transform
@@ -34,12 +35,12 @@ program main
    implicit none
 
    integer :: i, j, k, ijac
-   integer :: imax = 1000, jmax = 1000, kmax = 1000
+   integer :: imax = 100, jmax = 100, kmax = 100
    real*8 :: u = 1.0d0, v = 1.0d0, w = 1.0d0
    real*8 :: result
 
 ! Filling in pointer array
-   allocate(xjac(3,1000,1000,1000))
+   allocate(xjac(3,imax,jmax,kmax))
    !$acc parallel loop collapse(4) default(present)
    do k = 1, kmax
       do j = 1, jmax
